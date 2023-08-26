@@ -57,7 +57,13 @@
     selected = [];
     matches = [];
     timerId = null;
-    time = 60;
+    if (diffVal === 'Eazy') {
+      time = 60;
+    } else if (diffVal === 'Medium') {
+      time = 40;
+    } else if (diffVal === 'Hard') {
+      time = 25;
+    }
   }
 
   function gameWon() {
@@ -92,8 +98,29 @@
   $: maxMatches === matches.length && gameWon();
 
   $: time === 0 && gameLost();
+  
+  $: diffVal;
+  // $: console.log(time);
 
-  $: console.log(time);
+  var diffVal: String = 'Eazy';
+  var diffInputVal: number = 1;
+
+  function sliderVal() {
+    const difInput = document.getElementById('difficulty-slider') as HTMLInputElement;
+    if (difInput.value == '1') {
+      diffVal = 'Eazy';
+      diffInputVal = 1
+      time = 60;
+    } else if (difInput.value == '2') {
+      diffVal = 'Medium';
+      diffInputVal = 2;
+      time = 40;
+    } else if (difInput.value == '3') {
+      diffVal = 'Hard';
+      diffInputVal = 3;
+      time = 25;
+    }
+  }
 </script>
 
 <svelte:window on:keydown={pauseGame} />
@@ -108,13 +135,18 @@
 {#if state === 'start'}
   <h1>Matching Game</h1>
   <button on:click={() => state = 'playing'}>Play</button>
+  <div class="difficultly">
+    <label for="difficulty-slider">Difficultly: {diffVal}</label>
+    <input class="test" type="range" id="difficulty-slider" min="1" max="3" value={diffInputVal}
+            on:change={sliderVal}/>
+  </div>
 {/if}
 
 
 {#if state === 'playing'}
-  <h1 class="timer" class:pulse={time <= 10}>
-    {time}
-  </h1>
+  <div class="timer-wrapper">
+    <h1 class="timer" class:pulse={time <= 10}>{time}</h1>
+  </div>
 
   <div class="matches">
     {#each matches as card}
@@ -142,19 +174,56 @@
 {#if state === 'lost'}
    <h1>You Lost! 💩</h1>
    <button on:click={() => state = 'playing'}>Play again</button>
+   <div class="difficultly">
+    <label for="difficulty-slider">Difficultly: {diffVal}</label>
+    <input class="test" type="range" id="difficulty-slider" min="1" max="3" value={diffInputVal}
+            on:change={sliderVal}/>
+  </div>
 {/if}
 
 {#if state === 'won'}
-   <h1>You Won! 💩</h1>
+   <h1>You Won! 🥳</h1>
    <button on:click={() => state = 'playing'}>Play again</button>
+   <div class="difficultly">
+    <label for="difficulty-slider">Difficultly: {diffVal}</label>
+    <input class="test" type="range" id="difficulty-slider" min="1" max="3" value={diffInputVal}
+            on:change={sliderVal}/>
+  </div>
 {/if}
 
 
 <style>
+  .difficultly {
+    margin: 3rem auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    & label {
+      font-size: 2rem;
+    }
+    & input {
+      width: 250px;
+      margin: 1rem 0;
+      background: transparent;
+      border: 3px solid #d6d6d6;
+      border-radius: 15px;
+      outline: none;
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        background: rgb(0, 201, 201);
+        /* border: 1px solid blue; */
+        border-radius: 50%;
+      }
+    }
+  }
   .cards {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 15px;
+    user-select: none;
 
     & .card {
       height: 140px;
@@ -164,9 +233,23 @@
       border: 4px solid transparent;
       transition: rotate 0.3s ease-out;
       transform-style: preserve-3d;
+      & > div {
+        user-select: none;
+      }
+      @media (max-width: 767px) {
+        border-width: 2px;
+        height: 60px;
+        width: 60px;
+        & > div {
+          font-size: 33px;
+        }
+      }
 
       &.selected {
         border: 4px solid var(--border);
+        @media (max-width: 767px) {
+          border-width: 2px;
+        }
       }
 
       &.flip {
@@ -194,9 +277,20 @@
     gap: 1rem;
     margin-block: 2rem;
     font-size: 3rem;
+    height: 72px;
+    user-select: none;
+  }
+  .timer-wrapper {
+    height: 95px;
+    overflow: hidden;
+    user-select: none;
+    @media (max-width: 767px) {
+      height: 72px;
+    }
   }
   .timer {
     transition: color .3s ease;
+    user-select: none;
   }
   .pulse {
     color: var(--pulse);
