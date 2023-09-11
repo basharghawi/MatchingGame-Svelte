@@ -274,9 +274,10 @@
   }
   .matches {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    margin-block: 2rem;
-    font-size: 3rem;
+    margin-block: 3rem;
+    font-size: 2rem;
     height: 72px;
     user-select: none;
   }
